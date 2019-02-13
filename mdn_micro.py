@@ -11,6 +11,8 @@ import math as ma
 #import scipy
 import h5py
 import functions as fn
+import matplotlib.cm as cm
+import array
 
 figure_path = "./figures/"
 data_path = "/home/bryan/data/dlm/data/"
@@ -20,6 +22,7 @@ alpha_level = 0.1
 # in sess.run(train_op,feed_dict={x: x_data3, y: y_data3}), what sizes can x_data be?
 # add histograms, statistics
 # set stdev with data?
+# try testing with profiles, try plotting individual mixtures
 
 # =============================================================================
 # get data for MDN
@@ -34,19 +37,19 @@ Np = np.shape(eps)[0]
 #print(Np)
 
 # data needs to be shape (N,1):
-Nchunk = 10000
-Noffset = 1000000
-x_data = np.zeros([Nchunk,1])
-x_data[:,0] = z[Noffset:Nchunk+Noffset]
-y_data = np.zeros([Nchunk,1])
-y_data[:,0] = np.log10(eps[Noffset:Nchunk+Noffset])
+Nchunk1 = 1000
+Noffset1 = 1000000
+x_data = np.zeros([Nchunk1,1])
+x_data[:,0] = z[Noffset1:Nchunk1+Noffset1]
+y_data = np.zeros([Nchunk1,1])
+y_data[:,0] = np.log10(eps[Noffset1:Nchunk1+Noffset1])
 
-Nchunk = 2000
-Noffset = 1100000
-x_test = np.zeros([Nchunk,1])
-x_test[:,0] = z[int(2*Nchunk)+Noffset:int(3*Nchunk)+Noffset]
-y_test = np.zeros([Nchunk,1])
-y_test[:,0] = np.log10(eps[int(2*Nchunk)+Noffset:int(3*Nchunk)+Noffset])
+Nchunk2 = 1000
+Noffset2 = 1100000
+x_test = np.zeros([Nchunk2,1])
+x_test[:,0] = z[int(2*Nchunk2)+Noffset2:int(3*Nchunk2)+Noffset2]
+y_test = np.zeros([Nchunk2,1])
+y_test[:,0] = np.log10(eps[int(2*Nchunk2)+Noffset2:int(3*Nchunk2)+Noffset2])
 
 """
 x_data2 = np.zeros([Nchunk,4])
@@ -69,19 +72,19 @@ print(np.shape(y_test))
 
 plotname = figure_path +'micro_training_data.png' 
 fig = plt.figure(figsize=(8, 8))
-plt.plot(y_data,x_data,'bo',alpha=alpha_level)
+plt.plot(y_data,x_data,'ko',alpha=alpha_level)
 plt.ylabel(r"z",fontsize=13)
 plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
-plt.title(r"training data",fontsize=13)
+plt.title(r"training data, $N_{samples}=$%i" %(Nchunk1),fontsize=13)
 plt.savefig(plotname,format="png"); plt.close(fig);
 plt.show()
 
 plotname = figure_path +'micro_test_data.png' 
 fig = plt.figure(figsize=(8, 8))
-plt.plot(y_test,x_test,'ro',alpha=alpha_level)
+plt.plot(y_test,x_test,'ko',alpha=alpha_level)
 plt.ylabel(r"z",fontsize=13)
 plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
-plt.title(r"testing data",fontsize=13)
+plt.title(r"test data, $N_{samples}=$%i" %(Nchunk2),fontsize=13)
 plt.savefig(plotname,format="png"); plt.close(fig);
 plt.show()
 
@@ -123,7 +126,7 @@ sess.run(init)
 
 
 # 6) predictions on the training data (fit)
-NEPOCH = 10000
+NEPOCH = 1000
 for i in range(NEPOCH):
   sess.run(train_op,feed_dict={x: x_data, y: y_data})
 #x_test = np.zeros([Nchunk,1])
@@ -132,11 +135,11 @@ y_pred = sess.run(y_out,feed_dict={x: x_data})
 
 plotname = figure_path +'micro_training_prediction_nn.png' 
 fig = plt.figure(figsize=(8, 8))
-plt.plot(y_data,x_data,'bo',alpha=alpha_level,label=r"data")
-plt.plot(y_pred,x_data,'ko',alpha=alpha_level,label=r"NN")
+plt.plot(y_data,x_data,'ko',alpha=alpha_level,label=r"data")
+plt.plot(y_pred,x_data,'bo',alpha=alpha_level,label=r"NN")
 plt.ylabel(r"z",fontsize=13)
 plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
-plt.title(r"training data",fontsize=13)
+plt.title(r"NN training, $N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i" %(Nchunk1,NHIDDEN,NEPOCH),fontsize=13)
 plt.savefig(plotname,format="png"); plt.close(fig);
 
 
@@ -145,14 +148,12 @@ y_pred2 = sess.run(y_out,feed_dict={x: x_test})
 
 plotname = figure_path +'micro_test_prediction_nn.png' 
 fig = plt.figure(figsize=(8, 8))
-plt.plot(y_test,x_test,'ro',alpha=alpha_level,label=r"data")
-plt.plot(y_pred2,x_test,'ko',alpha=alpha_level,label=r"NN")
+plt.plot(y_test,x_test,'ko',alpha=alpha_level,label=r"data")
+plt.plot(y_pred2,x_test,'bo',alpha=alpha_level,label=r"NN")
 plt.ylabel(r"z",fontsize=13)
 plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
-plt.title(r"testing data",fontsize=13)
+plt.title(r"NN test, $N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i" %(Nchunk2,NHIDDEN,NEPOCH),fontsize=13)
 plt.savefig(plotname,format="png"); plt.close(fig);
-
-
 
 sess.close() # close the session afterwards to free resources
 
@@ -188,7 +189,7 @@ train_op = tf.train.AdamOptimizer().minimize(lossfunc)
 sess = tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 
-NEPOCH = 20000
+NEPOCH = 2000
 loss = np.zeros(NEPOCH) # store the training progress here.
 for i in range(NEPOCH):
   sess.run(train_op,feed_dict={x: x_data, y: y_data})
@@ -201,7 +202,9 @@ out_pi_train, out_sigma_train, out_mu_train = sess.run(fn.get_mixture_coeff(outp
 
 y_pred_test = fn.generate_ensemble( out_pi_test, out_mu_test, out_sigma_test, x_test )
 y_pred_train = fn.generate_ensemble( out_pi_train, out_mu_train, out_sigma_train, x_data )
-# y_pred = size(Nchunk,10?)
+# y_pred = size(Nchunk,10?) why 10?
+
+sess.close()
 
 """
 print(np.shape(y_test))
@@ -215,37 +218,65 @@ print(np.shape(out_pi_test))
 print(np.shape(out_sigma_test))
 """
 
+
+#print(np.shape(y_pred_test))
+colors = cm.rainbow(np.linspace( 0, 1, np.shape(y_pred_test)[1] ) )
+#print(np.shape(y_pred_test)[1])
+indices = array.array('i',(i for i in range(0,np.shape(y_pred_test)[1])))
+
 plotname = figure_path +'micro_test_prediction_mdn.png' 
 fig = plt.figure(figsize=(8, 8))
-plt.plot(y_test,x_test,'ro',alpha=alpha_level,label=r"data")
-plt.plot(y_pred_test[:,0],x_test,'ko',alpha=alpha_level,label=r"MDN")
-plt.plot(y_pred_test[:,1],x_test,'bo',alpha=alpha_level,label=r"MDN")
-plt.plot(y_pred_test[:,2],x_test,'co',alpha=alpha_level,label=r"MDN")
+plt.plot(y_test,x_test,'ko',alpha=alpha_level,label=r"data")
+for i, c in zip(indices, colors):
+ plt.scatter(y_pred_test[:,i],x_test, color=c,marker='o',alpha=alpha_level)
+#plt.plot(y_pred_test[:,0],x_test,'ko',alpha=alpha_level,label=r"MDN")
+#plt.plot(y_pred_test[:,1],x_test,'bo',alpha=alpha_level,label=r"MDN")
+#plt.plot(y_pred_test[:,2],x_test,'co',alpha=alpha_level,label=r"MDN")
 plt.ylabel(r"z",fontsize=13)
+plt.legend(loc=4)
 plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
-plt.title(r"testing data",fontsize=13)
-#plt.axis([-12.,-5.,-4500.,100.])
+plt.title(r"MDN test, $N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i, $N_{mix}=$%i" %(Nchunk1,NHIDDEN,NEPOCH,KMIX),fontsize=13)
+plt.axis([-12.25,-6.75,-5100.,100.])
 plt.savefig(plotname,format="png"); plt.close(fig);
-
 
 plotname = figure_path +'micro_training_prediction_mdn.png' 
 fig = plt.figure(figsize=(8, 8))
-plt.plot(y_data,x_data,'bo',alpha=alpha_level,label=r"data")
-plt.plot(y_pred_train[:,0],x_data,'ko',alpha=alpha_level,label=r"MDN")
-plt.plot(y_pred_train[:,1],x_data,'bo',alpha=alpha_level,label=r"MDN")
-plt.plot(y_pred_train[:,2],x_data,'co',alpha=alpha_level,label=r"MDN")
+plt.plot(y_data,x_data,'ko',alpha=alpha_level,label=r"data")
+for i, c in zip(indices, colors):
+ plt.scatter(y_pred_train[:,i],x_data, color=c,marker='o',alpha=alpha_level)
+#plt.plot(y_pred_train[:,0],x_data,'ko',alpha=alpha_level,label=r"MDN")
+#plt.plot(y_pred_train[:,1],x_data,'bo',alpha=alpha_level,label=r"MDN")
+#plt.plot(y_pred_train[:,2],x_data,'co',alpha=alpha_level,label=r"MDN")
 plt.ylabel(r"z",fontsize=13)
+plt.legend(loc=4)
 plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
-plt.title(r"training data",fontsize=13)
-#plt.axis([-12.,-5.,-4500.,100.])
+plt.title(r"MDN training, $N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i, $N_{mix}=$%i" %(Nchunk2,NHIDDEN,NEPOCH,KMIX),fontsize=13)
+plt.axis([-12.,-6.75,-4500.,100.])
 plt.savefig(plotname,format="png"); plt.close(fig);
 
 
+# running mean plots
 
+Nwindow = 10
 
+y_test_smooth = np.zeros([np.shape(y_test)[0]])
+y_test_smooth[:] = y_test[:,0]
+y_test_smooth = fn.smooth(y_test_smooth,Nwindow,'hanning')
 
+y_pred_test_smooth = np.zeros([np.shape(y_pred_test)[0]])
+y_pred_test_smooth[:] = np.mean(y_pred_test,1)
+y_pred_test_smooth = fn.smooth(y_pred_test_smooth,Nwindow,'hanning')
 
-sess.close()
+x_test_smooth = np.zeros([np.shape(x_test)[0]])
+x_test_smooth[:] = x_test[:,0]
+x_test_smooth = fn.smooth(x_test_smooth,Nwindow,'hanning')
 
-
+plotname = figure_path +'check.png' 
+fig = plt.figure(figsize=(8, 8))
+plt.plot(y_test_smooth,x_test_smooth,'k',label='data')
+plt.plot(y_pred_test_smooth,x_test_smooth,'b',label='MDN')
+plt.legend(loc=4,fontsize=13)
+plt.ylabel(r"z",fontsize=13)
+plt.xlabel(r"log$_{10}(\varepsilon)$",fontsize=13)
+plt.savefig(plotname,format="png"); plt.close(fig);
 
