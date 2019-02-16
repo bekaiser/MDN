@@ -1,2 +1,2 @@
-# mdn
-Mixture density network (MDN) predictions using Tensorflow. I follow the tutorial at http://blog.otoro.net/2015/11/24/mixture-density-networks-with-tensorflow/ and extent it to multi-dimensional inputs.
+# Mixture Density Networks
+Mixture density network (MDN) predictions using Tensorflow. I follow the tutorial at http://blog.otoro.net/2015/11/24/mixture-density-networks-with-tensorflow/ and extent it to multi-dimensional inputs. A mixture density network can model arbitrary conditional probability distributions in the same manner that conventional neural networks can model arbitrary functions. 
