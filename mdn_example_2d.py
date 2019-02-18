@@ -224,6 +224,9 @@ NTEST = x_test.size
 x_test = x_test.reshape(NTEST,1) # needs to be a matrix, not a vector
 
 out_pi_test, out_sigma_test, out_mu_test = sess.run(fn.get_mixture_coeff(output,KMIX), feed_dict={x: x_test})
+# pi = mixing coefficients (mixture model terminology)
+# mu = mean of the Gaussian pdf
+# sigma = variance of the Gaussian pdf
 
 y_test = fn.generate_ensemble( out_pi_test, out_mu_test, out_sigma_test, x_test , 10 )
 
