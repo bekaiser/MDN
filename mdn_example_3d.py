@@ -248,7 +248,7 @@ plt.savefig(plotname,format="png"); plt.close(fig);
 
 # construct the MDN:
 NHIDDEN = 24
-STDEV = 0.5
+STDEV = 0.5 
 KMIX = 24 # number of mixtures
 NOUT = KMIX * 3 # pi, mu, stdev
 

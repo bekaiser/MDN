@@ -204,7 +204,7 @@ sess = tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 
 # = 6000 for NHIDDEN = 24, STDEV = 0.5, KMIX = 24
-NEPOCH = 6000 
+NEPOCH = 4000 
 loss = np.zeros(NEPOCH) # store the training progress here.
 for i in range(NEPOCH):
   sess.run(train_op,feed_dict={x: x_data3, y: y_data3})
@@ -243,5 +243,24 @@ plt.title(r"$N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i, $N_{mix}=$%i" %(
 plt.savefig(plotname,format="png"); plt.close(fig);
 
 
+# plot priors and mus:
 
+plotname = figure_path +'training_prediction_2d_mdn_means.png'
+fig, ax1 = plt.subplots(figsize=(8, 8)) # = plt.figure(figsize=(8, 8))
+plt.plot(x_test,out_mu_test,'bo',alpha=alpha_level,label=r"mixture means")
+plt.plot(x_test,y_test,'ro',alpha=alpha_level,label=r"prediction")
+ax2 = ax1.twinx()
+ax1.set_xlabel(r"x",fontsize=13)
+ax1.set_ylabel(r"y(x)",fontsize=13,color='red')
+ax2.set_ylabel(r"$\mu_i$(x), i=[1,$N_{mix}$]",fontsize=13,color='blue')
+plt.title(r"$N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i, $N_{mix}=$%i" %(NSAMPLE3,NHIDDEN,NEPOCH,KMIX),fontsize=13)
+plt.savefig(plotname,format="png"); plt.close(fig);
 
+plotname = figure_path +'training_prediction_2d_mdn_priors.png'
+fig = plt.figure(figsize=(8, 8))
+plt.plot(x_test,out_pi_test,'ko',alpha=alpha_level,label=r"priors")
+#plt.plot(x_test,y_test,'ro',alpha=alpha_level,label=r"prediction")
+plt.xlabel(r"x",fontsize=13)
+plt.ylabel(r"$\alpha_i$(x), i=[1,$N_{mix}$]",fontsize=13)
+plt.title(r"$N_{samples}=$%i, $N_{hidden}=$%i, $N_{epochs}=$%i, $N_{mix}=$%i" %(NSAMPLE3,NHIDDEN,NEPOCH,KMIX),fontsize=13)
+plt.savefig(plotname,format="png"); plt.close(fig);
