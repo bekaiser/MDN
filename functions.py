@@ -46,6 +46,7 @@ def get_lossfunc(out_pi, out_sigma, out_mu, y):
 
 def get_pi_idx(x, pdf):
   N = pdf.size
+  #print(pdf.size)
   accumulate = 0
   for i in range(0, N):
     accumulate += pdf[i]
